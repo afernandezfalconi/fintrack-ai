@@ -1033,7 +1033,7 @@ function DashView({cards,setCards,transactions,activeCard,setActiveCard,cardMode
         </div>
       )}
 
-      {/* ── Stats ── */
+      {/* ── Stats ── */}
       <div style={{display:"grid",gridTemplateColumns:cardMode==="credit"?"1fr 1fr 1fr":"1fr 1fr",gap:10,padding:"14px 16px 0"}}>
         {(cardMode==="credit"?[
           {l:"GASTOS",  v:fmt(exp),  c:"#ff6060",I:TrendingDown},
