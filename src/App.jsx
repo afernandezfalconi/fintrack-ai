@@ -107,25 +107,9 @@ function GlobalStyles({ th }) {
 /* ═══════════════════════════════════════════════════════════════
    DATA — CREDIT & DEBIT CARDS
 ═══════════════════════════════════════════════════════════════ */
-const CREDIT_CARDS = [
-  { id:"cc1", kind:"credit", name:"Visa Platinum",    color:"#0d0d1e", accent:"#7c6af7", limit:50000, balance:18420, available:31580 },
-  { id:"cc2", kind:"credit", name:"Mastercard Gold",  color:"#1a1008", accent:"#f5a623", limit:30000, balance:7850,  available:22150 },
-  { id:"cc3", kind:"credit", name:"Amex Infinite",    color:"#081612", accent:"#34d5b0", limit:80000, balance:32100, available:47900 },
-];
-const DEBIT_CARDS = [
-  { id:"dc1", kind:"debit",  name:"BBVA Débito",      color:"#0a0f1e", accent:"#4a90e2", balance:15000 },
-  { id:"dc2", kind:"debit",  name:"Banorte Débito",   color:"#0f1a0a", accent:"#6abf69", balance:8500  },
-];
-
-const SEED_TXS = [
-  { id:"t1", cardId:"cc1", amount:1200, description:"Supermercado Chedraui", type:"expense", date:"2026-02-19T10:30:00Z" },
-  { id:"t2", cardId:"cc1", amount:450,  description:"Gasolina Pemex",        type:"expense", date:"2026-02-18T15:00:00Z" },
-  { id:"t3", cardId:"cc2", amount:2800, description:"Restaurante Pujol",     type:"expense", date:"2026-02-17T20:00:00Z" },
-  { id:"t4", cardId:"cc3", amount:5500, description:"Vuelo CDMX-CUN",        type:"expense", date:"2026-02-16T08:00:00Z" },
-  { id:"t5", cardId:"dc1", amount:320,  description:"Netflix & Spotify",     type:"expense", date:"2026-02-15T00:00:00Z" },
-  { id:"t6", cardId:"dc1", amount:5000, description:"Depósito nómina",       type:"income",  date:"2026-02-14T09:00:00Z" },
-  { id:"t7", cardId:"cc1", amount:3000, description:"Pago tarjeta",          type:"payment", date:"2026-02-13T11:00:00Z" },
-];
+const CREDIT_CARDS = [];
+const DEBIT_CARDS  = [];
+const SEED_TXS     = [];
 
 const SEED_CHAT = [{
   id:"m0", role:"assistant", ts:Date.now()-120000, status:"read",
@@ -746,9 +730,71 @@ function ReminderBanner({creditCards, cardReminders, th, onDismiss, onGoTo}) {
 }
 
 /* ═══════════════════════════════════════════════════════════════
+   RESET DIALOG — double confirmation
+═══════════════════════════════════════════════════════════════ */
+function ResetDialog({th, onCancel, onConfirm}){
+  const [step,setStep]=useState(1);
+
+  if(step===1) return(
+    <div style={{position:"fixed",inset:0,background:"#00000095",backdropFilter:"blur(8px)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9500,padding:24}}>
+      <div style={{background:th.shell,border:`1px solid #ff606044`,borderRadius:24,padding:"28px 24px",width:"100%",maxWidth:340,animation:"pop 0.25s ease",boxShadow:"0 24px 80px #000c"}}>
+        <div style={{width:52,height:52,borderRadius:16,background:"#ff404020",border:"1px solid #ff606044",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
+          <AlertTriangle size={24} color="#ff6060"/>
+        </div>
+        <div style={{textAlign:"center",marginBottom:20}}>
+          <div style={{fontWeight:800,fontSize:17,color:th.text,marginBottom:8}}>¿Borrar todo?</div>
+          <div style={{fontSize:13,color:th.textMid,lineHeight:1.6}}>
+            Esto eliminará <span style={{color:"#ff6060",fontWeight:700}}>todas tus tarjetas, transacciones y configuración</span>. La app volverá al estado inicial.
+          </div>
+        </div>
+        <div style={{display:"flex",gap:10}}>
+          <button onClick={onCancel} style={{flex:1,padding:"12px",borderRadius:12,border:`1px solid ${th.border2}`,background:th.surface2,color:th.textMid,fontWeight:700,fontSize:13,cursor:"pointer"}}>
+            Cancelar
+          </button>
+          <button onClick={()=>setStep(2)} style={{flex:1,padding:"12px",borderRadius:12,border:"none",background:"#ff404028",color:"#ff6060",fontWeight:700,fontSize:13,cursor:"pointer",border:"1px solid #ff606044"}}>
+            Sí, borrar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return(
+    <div style={{position:"fixed",inset:0,background:"#00000099",backdropFilter:"blur(12px)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:9500,padding:24}}>
+      <div style={{background:th.shell,border:`2px solid #ff6060`,borderRadius:24,padding:"28px 24px",width:"100%",maxWidth:340,animation:"pop 0.2s ease",boxShadow:"0 24px 80px #ff606020"}}>
+        <div style={{width:52,height:52,borderRadius:16,background:"#ff404040",border:"2px solid #ff6060",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",animation:"glow 1s ease infinite"}}>
+          <AlertTriangle size={24} color="#ff6060"/>
+        </div>
+        <div style={{textAlign:"center",marginBottom:8}}>
+          <div style={{fontWeight:800,fontSize:17,color:"#ff6060",marginBottom:8}}>¿Estás REALMENTE seguro?</div>
+          <div style={{fontSize:12,color:th.textMid,lineHeight:1.6,marginBottom:6}}>
+            No hay vuelta atrás. Una vez borrado,
+          </div>
+          <div style={{fontSize:13,fontWeight:700,color:"#ff6060",fontFamily:"'JetBrains Mono',monospace",background:"#ff404018",border:"1px solid #ff606044",borderRadius:8,padding:"8px 12px",marginBottom:16}}>
+            ⚠️ TODO SE PERDERÁ PARA SIEMPRE
+          </div>
+          <div style={{fontSize:11,color:th.textDim,fontFamily:"'JetBrains Mono',monospace"}}>
+            Tarjetas · Transacciones · PIN · Configuración
+          </div>
+        </div>
+        <div style={{display:"flex",gap:10,marginTop:20}}>
+          <button onClick={onCancel} style={{flex:1,padding:"12px",borderRadius:12,border:`1px solid ${th.border2}`,background:th.surface2,color:th.textMid,fontWeight:700,fontSize:13,cursor:"pointer"}}>
+            No, cancelar
+          </button>
+          <button onClick={onConfirm} style={{flex:1,padding:"12px",borderRadius:12,border:"2px solid #ff6060",background:"#ff404030",color:"#ff6060",fontWeight:800,fontSize:13,cursor:"pointer"}}>
+            Sí, BORRAR TODO
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    NOTIFICATIONS VIEW (full screen panel)
 ═══════════════════════════════════════════════════════════════ */
 function NotificationsView({creditCards, cardReminders, setCardReminders, reminderSettings, setReminderSettings, th, onBack}) {
+  const [showReset, setShowReset] = useState(false);
   const [notifPerm, setNotifPerm] = useState(
     typeof Notification !== "undefined" ? Notification.permission : "default"
   );
@@ -939,9 +985,30 @@ function NotificationsView({creditCards, cardReminders, setCardReminders, remind
           })}
         </div>
 
+        {/* ── Reset App ── */}
+        <div style={{background:th.surface,border:`1px solid #ff606033`,borderRadius:16,overflow:"hidden"}}>
+          <div style={{padding:"12px 14px",borderBottom:`1px solid ${th.border}`,display:"flex",alignItems:"center",gap:8}}>
+            <AlertTriangle size={13} color="#ff6060"/>
+            <span style={{fontWeight:700,fontSize:13,color:th.text}}>Zona de peligro</span>
+          </div>
+          <div style={{padding:"14px"}}>
+            <div style={{fontSize:12,color:th.textMid,marginBottom:12,lineHeight:1.5}}>
+              Elimina todos los datos, tarjetas, transacciones y configuración. La app volverá al estado inicial.
+            </div>
+            <button onClick={()=>setShowReset(true)} style={{width:"100%",padding:"11px",borderRadius:12,border:"1px solid #ff606044",background:"#ff404018",color:"#ff6060",fontWeight:700,fontSize:13,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+              <AlertTriangle size={14}/> Reinicio total de la app
+            </button>
+          </div>
+        </div>
+
         <div style={{height:20}}/>
       </div>
     </div>
+    {showReset&&<ResetDialog th={th} onCancel={()=>setShowReset(false)} onConfirm={()=>{
+      // Clear everything
+      localStorage.clear();
+      window.location.reload();
+    }}/>}
   );
 }
 
@@ -1107,6 +1174,638 @@ function DashView({cards,setCards,transactions,activeCard,setActiveCard,cardMode
    ROOT APP
 ═══════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════
+   AUTH SYSTEM — PIN + WebAuthn (Face ID / Huella)
+═══════════════════════════════════════════════════════════════ */
+const AUTH_KEY = "fintrack_auth_v1";
+
+function loadAuth(){
+  try{ const r=localStorage.getItem(AUTH_KEY); return r?JSON.parse(r):null; }catch{ return null; }
+}
+function saveAuth(data){
+  try{ localStorage.setItem(AUTH_KEY,JSON.stringify(data)); }catch{}
+}
+
+// Simple hash (not cryptographic, but enough for local PIN)
+async function hashPin(pin){
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(pin+"fintrack_salt_2026"));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+// Generate recovery code (8 random words from numbers)
+function genRecoveryCode(){
+  const words=[];
+  for(let i=0;i<3;i++) words.push(Math.random().toString(36).slice(2,7).toUpperCase());
+  return words.join("-");
+}
+
+// WebAuthn helpers
+async function registerBiometric(userId){
+  if(!window.PublicKeyCredential) return false;
+  try{
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const cred = await navigator.credentials.create({
+      publicKey:{
+        challenge,
+        rp:{name:"FinTrack AI", id:location.hostname},
+        user:{id:new TextEncoder().encode(userId), name:userId, displayName:"FinTrack User"},
+        pubKeyCredParams:[{alg:-7,type:"public-key"},{alg:-257,type:"public-key"}],
+        authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required"},
+        timeout:60000,
+      }
+    });
+    if(!cred) return false;
+    const credId = btoa(String.fromCharCode(...new Uint8Array(cred.rawId)));
+    return credId;
+  }catch(e){ return false; }
+}
+
+async function verifyBiometric(credentialId){
+  if(!credentialId||!window.PublicKeyCredential) return false;
+  try{
+    const challenge = crypto.getRandomValues(new Uint8Array(32));
+    const rawId = Uint8Array.from(atob(credentialId),c=>c.charCodeAt(0));
+    const assertion = await navigator.credentials.get({
+      publicKey:{
+        challenge,
+        allowCredentials:[{id:rawId,type:"public-key"}],
+        userVerification:"required",
+        timeout:60000,
+      }
+    });
+    return !!assertion;
+  }catch(e){ return false; }
+}
+
+/* ── PIN SETUP SCREEN ── */
+function PinSetup({th, onDone}){
+  const [step,setStep]=useState("pin"); // pin | confirm | recovery
+  const [pin,setPin]=useState("");
+  const [confirm,setConfirm]=useState("");
+  const [error,setError]=useState("");
+  const [recovery,setRecovery]=useState("");
+  const [bioAvail,setBioAvail]=useState(false);
+  const [shake,setShake]=useState(false);
+
+  useEffect(()=>{
+    window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable?.()
+      .then(ok=>setBioAvail(ok)).catch(()=>{});
+  },[]);
+
+  const doShake=()=>{ setShake(true); setTimeout(()=>setShake(false),500); };
+
+  const handleDigit=(d)=>{
+    if(step==="pin"&&pin.length<6) setPin(p=>p+d);
+    if(step==="confirm"&&confirm.length<6) setConfirm(p=>p+d);
+  };
+  const handleDel=()=>{
+    if(step==="pin") setPin(p=>p.slice(0,-1));
+    if(step==="confirm") setConfirm(p=>p.slice(0,-1));
+  };
+
+  const handleNext=async()=>{
+    if(step==="pin"){
+      if(pin.length<4){ setError("Mínimo 4 dígitos"); doShake(); return; }
+      setError(""); setStep("confirm");
+    } else if(step==="confirm"){
+      if(confirm!==pin){ setError("Los PINs no coinciden"); doShake(); setConfirm(""); return; }
+      const rc=genRecoveryCode();
+      setRecovery(rc);
+      setStep("recovery");
+    } else if(step==="recovery"){
+      const hashed=await hashPin(pin);
+      const authData={pinHash:hashed, recoveryCode:recovery, credentialId:null, setupDone:true};
+      // Try to register biometric
+      if(bioAvail){
+        const credId=await registerBiometric("fintrack-user");
+        if(credId) authData.credentialId=credId;
+      }
+      saveAuth(authData);
+      onDone();
+    }
+  };
+
+  const dots=(val,max=6)=>Array.from({length:max},(_,i)=>(
+    <div key={i} style={{width:12,height:12,borderRadius:"50%",background:i<val.length?"#7c6af7":th.border2,border:`2px solid ${i<val.length?"#7c6af7":th.border2}`,transition:"all 0.15s"}}/>
+  ));
+
+  const Pad=()=>(
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:220,margin:"0 auto"}}>
+      {[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map((d,i)=>(
+        <button key={i} onClick={()=>d===""?null:d==="⌫"?handleDel():handleDigit(String(d))}
+          style={{height:60,borderRadius:16,border:`1px solid ${th.border2}`,background:d===""?"transparent":th.surface2,
+            color:th.text,fontSize:d==="⌫"?18:20,fontWeight:700,cursor:d===""?"default":"pointer",
+            fontFamily:"'JetBrains Mono',monospace",transition:"all 0.1s",
+            opacity:d===""?0:1,
+          }}>{d}</button>
+      ))}
+    </div>
+  );
+
+  return(
+    <div style={{position:"fixed",inset:0,background:th.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:9000,padding:24}}>
+      <div style={{width:48,height:48,borderRadius:14,background:"linear-gradient(135deg,#7c6af7,#34d5b0)",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20}}>
+        <Zap size={22} color="#fff" fill="#fff"/>
+      </div>
+      <div style={{fontWeight:800,fontSize:22,color:th.text,marginBottom:6,letterSpacing:-0.5}}>fintrack</div>
+
+      {step==="pin"&&<>
+        <div style={{fontSize:13,color:th.textMid,marginBottom:28,textAlign:"center"}}>Crea tu PIN de acceso</div>
+        <div style={{display:"flex",gap:10,marginBottom:8,animation:shake?"shakeDot 0.4s ease":"none"}}>{dots(pin)}</div>
+        <div style={{fontSize:10,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",marginBottom:28}}>{pin.length}/6 dígitos (mínimo 4)</div>
+        {error&&<div style={{fontSize:11,color:"#ff6060",marginBottom:12,fontFamily:"'JetBrains Mono',monospace"}}>{error}</div>}
+        <Pad/>
+        <button onClick={handleNext} disabled={pin.length<4}
+          style={{marginTop:24,background:pin.length>=4?"linear-gradient(90deg,#7c6af7,#34d5b0)":"#333",border:"none",borderRadius:14,padding:"13px 40px",color:"#fff",fontWeight:700,fontSize:14,cursor:pin.length>=4?"pointer":"default",opacity:pin.length>=4?1:0.4}}>
+          Continuar →
+        </button>
+      </>}
+
+      {step==="confirm"&&<>
+        <div style={{fontSize:13,color:th.textMid,marginBottom:28,textAlign:"center"}}>Confirma tu PIN</div>
+        <div style={{display:"flex",gap:10,marginBottom:8,animation:shake?"shakeDot 0.4s ease":"none"}}>{dots(confirm)}</div>
+        <div style={{fontSize:10,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",marginBottom:28}}>{confirm.length}/6</div>
+        {error&&<div style={{fontSize:11,color:"#ff6060",marginBottom:12,fontFamily:"'JetBrains Mono',monospace"}}>{error}</div>}
+        <Pad/>
+        <button onClick={handleNext} disabled={confirm.length<4}
+          style={{marginTop:24,background:confirm.length>=4?"linear-gradient(90deg,#7c6af7,#34d5b0)":"#333",border:"none",borderRadius:14,padding:"13px 40px",color:"#fff",fontWeight:700,fontSize:14,cursor:confirm.length>=4?"pointer":"default",opacity:confirm.length>=4?1:0.4}}>
+          Confirmar PIN →
+        </button>
+        <button onClick={()=>{setStep("pin");setPin("");setConfirm("");setError("");}} style={{marginTop:12,background:"none",border:"none",color:th.textDim,fontSize:12,cursor:"pointer"}}>← Cambiar PIN</button>
+      </>}
+
+      {step==="recovery"&&<>
+        <div style={{fontSize:13,color:th.textMid,marginBottom:20,textAlign:"center",maxWidth:300}}>¡PIN creado! Guarda tu código de recuperación en un lugar seguro</div>
+        <div style={{background:th.surface,border:"1px solid #7c6af744",borderRadius:16,padding:"18px 24px",marginBottom:20,textAlign:"center"}}>
+          <div style={{fontSize:10,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",letterSpacing:2,marginBottom:8}}>CÓDIGO DE RECUPERACIÓN</div>
+          <div style={{fontSize:22,fontWeight:800,color:"#7c6af7",fontFamily:"'JetBrains Mono',monospace",letterSpacing:2}}>{recovery}</div>
+        </div>
+        <div style={{background:"#f5a62318",border:"1px solid #f5a62344",borderRadius:12,padding:"10px 14px",marginBottom:24,maxWidth:300}}>
+          <div style={{fontSize:11,color:"#f5a623",fontFamily:"'JetBrains Mono',monospace",lineHeight:1.5,textAlign:"center"}}>
+            ⚠️ Si pierdes este código y olvidas tu PIN, no podrás recuperar tu cuenta. Guárdalo en notas o screenshot.
+          </div>
+        </div>
+        {bioAvail&&<div style={{fontSize:11,color:"#34d5b0",fontFamily:"'JetBrains Mono',monospace",marginBottom:16,textAlign:"center"}}>✓ Face ID / Huella también se activará</div>}
+        <button onClick={handleNext}
+          style={{background:"linear-gradient(90deg,#7c6af7,#34d5b0)",border:"none",borderRadius:14,padding:"13px 40px",color:"#fff",fontWeight:700,fontSize:14,cursor:"pointer"}}>
+          Ya lo guardé — Entrar →
+        </button>
+      </>}
+    </div>
+  );
+}
+
+/* ── LOCK SCREEN ── */
+function LockScreen({th, onUnlock}){
+  const [pin,setPin]=useState("");
+  const [error,setError]=useState("");
+  const [attempts,setAttempts]=useState(0);
+  const [locked,setLocked]=useState(false);
+  const [lockUntil,setLockUntil]=useState(0);
+  const [recovering,setRecovering]=useState(false);
+  const [recInput,setRecInput]=useState("");
+  const [shake,setShake]=useState(false);
+  const [bioAvail,setBioAvail]=useState(false);
+  const auth=loadAuth();
+
+  useEffect(()=>{
+    window.PublicKeyCredential?.isUserVerifyingPlatformAuthenticatorAvailable?.()
+      .then(ok=>setBioAvail(ok&&!!auth?.credentialId)).catch(()=>{});
+    // Auto-try biometric on mount
+    if(auth?.credentialId){
+      setTimeout(()=>tryBio(),400);
+    }
+  },[]);
+
+  // Countdown timer
+  useEffect(()=>{
+    if(!locked) return;
+    const id=setInterval(()=>{
+      if(Date.now()>=lockUntil){ setLocked(false); setAttempts(0); }
+    },1000);
+    return ()=>clearInterval(id);
+  },[locked,lockUntil]);
+
+  const doShake=()=>{ setShake(true); setTimeout(()=>setShake(false),500); };
+
+  const tryBio=async()=>{
+    const ok=await verifyBiometric(auth.credentialId);
+    if(ok) onUnlock();
+    else setError("Biométrico no reconocido");
+  };
+
+  const handleDigit=(d)=>{ if(pin.length<6&&!locked) setPin(p=>p+d); };
+  const handleDel=()=>{ if(!locked) setPin(p=>p.slice(0,-1)); };
+
+  const handleUnlock=async()=>{
+    if(locked||pin.length<4) return;
+    const hashed=await hashPin(pin);
+    if(hashed===auth.pinHash){
+      setPin(""); setError(""); setAttempts(0);
+      onUnlock();
+    } else {
+      const na=attempts+1;
+      setAttempts(na); setPin(""); doShake();
+      if(na>=5){
+        const until=Date.now()+30000;
+        setLocked(true); setLockUntil(until);
+        setError("Demasiados intentos. Espera 30 segundos.");
+      } else {
+        setError(`PIN incorrecto. ${5-na} intentos restantes.`);
+      }
+    }
+  };
+
+  const handleRecover=()=>{
+    if(recInput.trim().toUpperCase()===auth.recoveryCode){
+      saveAuth({...auth, pinHash:null, setupDone:false});
+      onUnlock();
+    } else {
+      doShake(); setError("Código incorrecto");
+    }
+  };
+
+  const dots=(val,max=6)=>Array.from({length:max},(_,i)=>(
+    <div key={i} style={{width:12,height:12,borderRadius:"50%",background:i<val.length?"#7c6af7":th.border2,border:`2px solid ${i<val.length?"#7c6af7":th.border2}`,transition:"all 0.15s"}}/>
+  ));
+
+  const Pad=()=>(
+    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10,maxWidth:220,margin:"0 auto"}}>
+      {[1,2,3,4,5,6,7,8,9,"",0,"⌫"].map((d,i)=>(
+        <button key={i} onClick={()=>d===""?null:d==="⌫"?handleDel():handleDigit(String(d))}
+          disabled={locked}
+          style={{height:60,borderRadius:16,border:`1px solid ${th.border2}`,background:d===""?"transparent":th.surface2,
+            color:th.text,fontSize:d==="⌫"?18:20,fontWeight:700,cursor:d===""||locked?"default":"pointer",
+            fontFamily:"'JetBrains Mono',monospace",opacity:d===""?0:locked?0.4:1,
+          }}>{d}</button>
+      ))}
+    </div>
+  );
+
+  if(recovering) return(
+    <div style={{position:"fixed",inset:0,background:th.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:9000,padding:24}}>
+      <div style={{width:48,height:48,borderRadius:14,background:"linear-gradient(135deg,#7c6af7,#34d5b0)",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20}}>
+        <Zap size={22} color="#fff" fill="#fff"/>
+      </div>
+      <div style={{fontWeight:700,fontSize:18,color:th.text,marginBottom:8}}>Recuperar acceso</div>
+      <div style={{fontSize:12,color:th.textMid,marginBottom:24,textAlign:"center",maxWidth:280}}>Ingresa el código de recuperación que guardaste al crear tu PIN</div>
+      <input value={recInput} onChange={e=>setRecInput(e.target.value)}
+        placeholder="XXXXX-XXXXX-XXXXX"
+        style={{background:th.surface2,border:`1px solid ${th.border2}`,borderRadius:12,padding:"12px 16px",color:th.text,fontFamily:"'JetBrains Mono',monospace",fontSize:14,width:"100%",maxWidth:280,outline:"none",textAlign:"center",letterSpacing:2,animation:shake?"shakeDot 0.4s ease":"none"}}/>
+      {error&&<div style={{fontSize:11,color:"#ff6060",marginTop:8,fontFamily:"'JetBrains Mono',monospace"}}>{error}</div>}
+      <button onClick={handleRecover} style={{marginTop:20,background:"linear-gradient(90deg,#7c6af7,#34d5b0)",border:"none",borderRadius:12,padding:"12px 32px",color:"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>Recuperar acceso</button>
+      <button onClick={()=>{setRecovering(false);setError("");}} style={{marginTop:12,background:"none",border:"none",color:th.textDim,fontSize:12,cursor:"pointer"}}>← Volver</button>
+    </div>
+  );
+
+  return(
+    <div style={{position:"fixed",inset:0,background:th.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",zIndex:9000,padding:24}}>
+      <div style={{width:48,height:48,borderRadius:14,background:"linear-gradient(135deg,#7c6af7,#34d5b0)",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:20}}>
+        <Zap size={22} color="#fff" fill="#fff"/>
+      </div>
+      <div style={{fontWeight:800,fontSize:22,color:th.text,marginBottom:4,letterSpacing:-0.5}}>fintrack</div>
+      <div style={{fontSize:12,color:th.textMid,marginBottom:28}}>Ingresa tu PIN</div>
+
+      <div style={{display:"flex",gap:10,marginBottom:8,animation:shake?"shakeDot 0.4s ease":"none"}}>{dots(pin)}</div>
+      <div style={{fontSize:10,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",marginBottom:24,minHeight:16}}>{error}</div>
+
+      <Pad/>
+
+      <div style={{display:"flex",gap:16,marginTop:24,alignItems:"center"}}>
+        {bioAvail&&(
+          <button onClick={tryBio} style={{background:th.surface2,border:`1px solid ${th.border2}`,borderRadius:12,padding:"10px 16px",color:"#7c6af7",cursor:"pointer",display:"flex",alignItems:"center",gap:6,fontSize:12,fontWeight:600}}>
+            <span style={{fontSize:18}}>🔐</span> Face ID / Huella
+          </button>
+        )}
+      </div>
+
+      <button onClick={()=>setRecovering(true)} style={{marginTop:20,background:"none",border:"none",color:th.textDim,fontSize:11,cursor:"pointer",fontFamily:"'JetBrains Mono',monospace"}}>
+        ¿Olvidaste tu PIN? Usar código de recuperación
+      </button>
+
+      {pin.length>=4&&!locked&&(
+        <button onClick={handleUnlock} style={{position:"absolute",bottom:48,background:"linear-gradient(90deg,#7c6af7,#34d5b0)",border:"none",borderRadius:14,padding:"13px 48px",color:"#fff",fontWeight:700,fontSize:15,cursor:"pointer",boxShadow:"0 8px 24px #7c6af740"}}>
+          Entrar →
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ── AUTH GATE ── */
+function AuthGate({th, children}){
+  const [status,setStatus]=useState(()=>{
+    const a=loadAuth();
+    if(!a?.setupDone) return "setup";
+    return "locked";
+  });
+
+  // Auto-lock when tab goes background
+  useEffect(()=>{
+    const handler=()=>{ if(document.hidden&&status==="unlocked") setStatus("locked"); };
+    document.addEventListener("visibilitychange",handler);
+    return ()=>document.removeEventListener("visibilitychange",handler);
+  },[status]);
+
+  if(status==="setup") return <PinSetup th={th} onDone={()=>setStatus("locked")}/>;
+  if(status==="locked") return <LockScreen th={th} onUnlock={()=>setStatus("unlocked")}/>;
+  return children;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ONBOARDING — first-time setup wizard
+═══════════════════════════════════════════════════════════════ */
+const CARD_ACCENTS = ["#7c6af7","#f5a623","#34d5b0","#4a90e2","#ff6060","#6abf69","#e91e8c","#00bcd4"];
+const CARD_COLORS  = ["#0d0d1e","#1a1008","#081612","#0a0f1e","#1a0808","#0a1a08","#1a0814","#081a1a"];
+
+function Onboarding({th, onDone}){
+  const [step,setStep]=useState(0);
+  // step 0 = welcome
+  // step 1 = add credit card (optional)
+  // step 2 = add debit card (optional)
+  // step 3 = first transaction
+  // step 4 = done
+
+  const [creditCards,setCreditCards]=useState([]);
+  const [debitCards,setDebitCards]=useState([]);
+  const [txs,setTxs]=useState([]);
+
+  // Credit card form
+  const [ccForm,setCcForm]=useState({name:"",limit:"",balance:"",accent:"#7c6af7",color:"#0d0d1e"});
+  // Debit card form
+  const [dcForm,setDcForm]=useState({name:"",balance:"",accent:"#4a90e2",color:"#0a0f1e"});
+  // First tx form
+  const [txForm,setTxForm]=useState({
+    type:"expense",
+    amount:"",
+    description:"",
+    date: new Date().toISOString().slice(0,10),
+    cardId:"",
+  });
+
+  const today = new Date().toISOString().slice(0,10);
+  const inp = {
+    background:th.inputBg, border:`1px solid ${th.border2}`, borderRadius:10,
+    padding:"10px 12px", color:th.text, fontSize:13, width:"100%", outline:"none",
+    fontFamily:"'Syne',sans-serif",
+  };
+  const label = {fontSize:9,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",letterSpacing:1.5,marginBottom:5,display:"block"};
+
+  const addCreditCard=()=>{
+    if(!ccForm.name||!ccForm.limit) return;
+    const limit=parseFloat(ccForm.limit)||0;
+    const balance=parseFloat(ccForm.balance)||0;
+    const id="cc"+genId();
+    setCreditCards(p=>[...p,{id,kind:"credit",name:ccForm.name,color:ccForm.color,accent:ccForm.accent,limit,balance,available:Math.max(0,limit-balance)}]);
+    setCcForm({name:"",limit:"",balance:"",accent:"#7c6af7",color:"#0d0d1e"});
+    setStep(2);
+  };
+  const addDebitCard=()=>{
+    if(!dcForm.name) return;
+    const balance=parseFloat(dcForm.balance)||0;
+    const id="dc"+genId();
+    setDebitCards(p=>[...p,{id,kind:"debit",name:dcForm.name,color:dcForm.color,accent:dcForm.accent,balance}]);
+    setDcForm({name:"",balance:"",accent:"#4a90e2",color:"#0a0f1e"});
+    setStep(3);
+  };
+
+  const allCards=[...creditCards,...debitCards];
+
+  const finish=(extraTx)=>{
+    const finalTxs=extraTx?[extraTx]:txs;
+    onDone({creditCards,debitCards,txs:finalTxs});
+  };
+
+  const addFirstTx=()=>{
+    if(!txForm.amount||!txForm.description) return;
+    const cardId=txForm.cardId||(allCards[0]?.id)||"none";
+    const date=txForm.date||today;
+    const tx={id:genId(),cardId,amount:parseFloat(txForm.amount),description:txForm.description,type:txForm.type,date:new Date(date).toISOString()};
+    finish(tx);
+  };
+
+  // Progress bar
+  const totalSteps=4;
+  const pct=Math.round((step/totalSteps)*100);
+
+  return(
+    <div style={{position:"fixed",inset:0,background:th.bg,display:"flex",flexDirection:"column",alignItems:"center",zIndex:8000,overflowY:"auto"}}>
+      <div style={{width:"100%",maxWidth:480,padding:"24px 20px 60px",display:"flex",flexDirection:"column",gap:0}}>
+
+        {/* Logo */}
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28}}>
+          <div style={{width:36,height:36,borderRadius:10,background:"linear-gradient(135deg,#7c6af7,#34d5b0)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <Zap size={16} color="#fff" fill="#fff"/>
+          </div>
+          <span style={{fontWeight:800,fontSize:18,letterSpacing:-0.5,color:th.text}}>fintrack <span style={{fontSize:10,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",background:th.surface2,padding:"2px 7px",borderRadius:99,border:`1px solid ${th.border}`}}>AI</span></span>
+        </div>
+
+        {/* Progress */}
+        {step>0&&step<4&&(
+          <div style={{marginBottom:24}}>
+            <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
+              <span style={{fontSize:10,color:th.textDim,fontFamily:"'JetBrains Mono',monospace"}}>PASO {step} DE {totalSteps}</span>
+              <span style={{fontSize:10,color:"#7c6af7",fontFamily:"'JetBrains Mono',monospace"}}>{pct}%</span>
+            </div>
+            <div style={{height:3,background:th.border2,borderRadius:2}}>
+              <div style={{height:"100%",width:`${pct}%`,background:"linear-gradient(90deg,#7c6af7,#34d5b0)",borderRadius:2,transition:"width 0.4s ease"}}/>
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 0: Welcome ── */}
+        {step===0&&(
+          <div style={{animation:"fadeUp 0.4s ease"}}>
+            <div style={{fontSize:28,fontWeight:800,color:th.text,lineHeight:1.2,marginBottom:12}}>
+              Bienvenido a<br/><span style={{background:"linear-gradient(90deg,#7c6af7,#34d5b0)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>FinTrack AI</span> 👋
+            </div>
+            <div style={{fontSize:11,color:"#34d5b0",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,letterSpacing:0.5,lineHeight:1.7,marginBottom:12,padding:"10px 14px",background:"#34d5b012",border:"1px solid #34d5b033",borderRadius:10}}>
+              El primer paso para tu libertad financiera es administrar tus egresos e ingresos. Felicidades, estás en el camino adecuado 🌟
+            </div>
+            <div style={{fontSize:14,color:th.textMid,lineHeight:1.7,marginBottom:32}}>
+              Tu asistente financiero personal. En los siguientes pasos configuraremos tu cuenta para que tengas control total de tus finanzas.
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:32}}>
+              {[
+                {icon:"💳", t:"Agrega tus tarjetas", d:"Crédito y débito, o empieza sin ellas"},
+                {icon:"📊", t:"Registra movimientos", d:"Gastos, ingresos y pagos con fecha exacta"},
+                {icon:"🔔", t:"Recibe recordatorios", d:"Alertas de pago antes de que venzan"},
+                {icon:"🤖", t:"Chat con IA", d:"Registra gastos con lenguaje natural o fotos"},
+              ].map(({icon,t,d})=>(
+                <div key={t} style={{display:"flex",gap:12,alignItems:"center",background:th.surface,border:`1px solid ${th.border}`,borderRadius:14,padding:"12px 14px"}}>
+                  <div style={{fontSize:22,flexShrink:0}}>{icon}</div>
+                  <div>
+                    <div style={{fontWeight:700,fontSize:13,color:th.text}}>{t}</div>
+                    <div style={{fontSize:11,color:th.textDim,marginTop:1}}>{d}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <button onClick={()=>setStep(1)} style={{width:"100%",background:"linear-gradient(90deg,#7c6af7,#34d5b0)",border:"none",borderRadius:14,padding:"15px",color:"#fff",fontWeight:800,fontSize:15,cursor:"pointer",boxShadow:"0 8px 24px #7c6af740"}}>
+              Comenzar →
+            </button>
+          </div>
+        )}
+
+        {/* ── STEP 1: Credit Card ── */}
+        {step===1&&(
+          <div style={{animation:"fadeUp 0.3s ease"}}>
+            <div style={{fontSize:22,fontWeight:800,color:th.text,marginBottom:6}}>💳 Tarjeta de crédito</div>
+            <div style={{fontSize:13,color:th.textMid,marginBottom:6,lineHeight:1.6}}>
+              Agrega tu primera tarjeta de crédito para llevar control de gastos y pagos.
+            </div>
+            <div style={{background:"#7c6af718",border:"1px solid #7c6af733",borderRadius:10,padding:"9px 12px",marginBottom:20,fontSize:11,color:"#7c6af7",fontFamily:"'JetBrains Mono',monospace"}}>
+              💡 Recomendado — tendrás mejor control desde el inicio
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <div>
+                <span style={label}>NOMBRE DE LA TARJETA</span>
+                <input style={inp} placeholder="ej. Visa Platinum, BBVA Azul..." value={ccForm.name} onChange={e=>setCcForm(p=>({...p,name:e.target.value}))}/>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                <div>
+                  <span style={label}>LÍMITE DE CRÉDITO</span>
+                  <input style={inp} type="number" placeholder="50000" value={ccForm.limit} onChange={e=>setCcForm(p=>({...p,limit:e.target.value}))}/>
+                </div>
+                <div>
+                  <span style={label}>SALDO ACTUAL USADO</span>
+                  <input style={inp} type="number" placeholder="0" value={ccForm.balance} onChange={e=>setCcForm(p=>({...p,balance:e.target.value}))}/>
+                </div>
+              </div>
+              <div>
+                <span style={label}>COLOR DE ACENTO</span>
+                <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                  {CARD_ACCENTS.map((c,i)=>(
+                    <div key={c} onClick={()=>setCcForm(p=>({...p,accent:c,color:CARD_COLORS[i]}))}
+                      style={{width:28,height:28,borderRadius:"50%",background:c,cursor:"pointer",border:`3px solid ${ccForm.accent===c?"#fff":"transparent"}`,transition:"all 0.15s"}}/>
+                  ))}
+                </div>
+              </div>
+              {/* Card preview */}
+              {ccForm.name&&(
+                <div style={{background:`linear-gradient(145deg,${ccForm.color},${ccForm.accent}22)`,border:`1px solid ${ccForm.accent}44`,borderRadius:16,padding:"14px 16px"}}>
+                  <div style={{fontSize:9,color:ccForm.accent,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,letterSpacing:1.5,marginBottom:8}}>{ccForm.name.toUpperCase()}</div>
+                  <div style={{fontSize:18,fontWeight:800,color:"#fff"}}>{fmt(parseFloat(ccForm.balance)||0)}</div>
+                  <div style={{fontSize:9,color:"#ffffff44",fontFamily:"'JetBrains Mono',monospace"}}>de {fmt(parseFloat(ccForm.limit)||0)} · CRÉDITO</div>
+                </div>
+              )}
+              <button onClick={addCreditCard} disabled={!ccForm.name||!ccForm.limit}
+                style={{background:ccForm.name&&ccForm.limit?"linear-gradient(90deg,#7c6af7,#34d5b0)":"#333",border:"none",borderRadius:12,padding:"13px",color:"#fff",fontWeight:700,fontSize:14,cursor:ccForm.name&&ccForm.limit?"pointer":"default",opacity:ccForm.name&&ccForm.limit?1:0.5}}>
+                Agregar tarjeta →
+              </button>
+              <button onClick={()=>setStep(2)} style={{background:"none",border:`1px solid ${th.border2}`,borderRadius:12,padding:"11px",color:th.textDim,fontSize:12,cursor:"pointer"}}>
+                Omitir por ahora
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 2: Debit Card ── */}
+        {step===2&&(
+          <div style={{animation:"fadeUp 0.3s ease"}}>
+            <div style={{fontSize:22,fontWeight:800,color:th.text,marginBottom:6}}>🏦 Tarjeta de débito</div>
+            <div style={{fontSize:13,color:th.textMid,marginBottom:6,lineHeight:1.6}}>
+              Agrega una tarjeta de débito para registrar ingresos y egresos de tu cuenta bancaria.
+            </div>
+            <div style={{background:"#34d5b018",border:"1px solid #34d5b033",borderRadius:10,padding:"9px 12px",marginBottom:20,fontSize:11,color:"#34d5b0",fontFamily:"'JetBrains Mono',monospace"}}>
+              💡 Recomendado — registra nómina y gastos del día a día
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              <div>
+                <span style={label}>NOMBRE DE LA TARJETA</span>
+                <input style={inp} placeholder="ej. BBVA Débito, Banorte..." value={dcForm.name} onChange={e=>setDcForm(p=>({...p,name:e.target.value}))}/>
+              </div>
+              <div>
+                <span style={label}>SALDO ACTUAL</span>
+                <input style={inp} type="number" placeholder="0" value={dcForm.balance} onChange={e=>setDcForm(p=>({...p,balance:e.target.value}))}/>
+              </div>
+              <div>
+                <span style={label}>COLOR</span>
+                <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                  {CARD_ACCENTS.map((c,i)=>(
+                    <div key={c} onClick={()=>setDcForm(p=>({...p,accent:c,color:CARD_COLORS[i]}))}
+                      style={{width:28,height:28,borderRadius:"50%",background:c,cursor:"pointer",border:`3px solid ${dcForm.accent===c?"#fff":"transparent"}`,transition:"all 0.15s"}}/>
+                  ))}
+                </div>
+              </div>
+              {dcForm.name&&(
+                <div style={{background:`linear-gradient(145deg,${dcForm.color},${dcForm.accent}22)`,border:`1px solid ${dcForm.accent}44`,borderRadius:16,padding:"14px 16px"}}>
+                  <div style={{fontSize:9,color:dcForm.accent,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,letterSpacing:1.5,marginBottom:8}}>{dcForm.name.toUpperCase()}</div>
+                  <div style={{fontSize:18,fontWeight:800,color:"#fff"}}>{fmt(parseFloat(dcForm.balance)||0)}</div>
+                  <div style={{fontSize:9,color:"#ffffff44",fontFamily:"'JetBrains Mono',monospace"}}>SALDO DISPONIBLE · DÉBITO</div>
+                </div>
+              )}
+              <button onClick={addDebitCard} disabled={!dcForm.name}
+                style={{background:dcForm.name?"linear-gradient(90deg,#7c6af7,#34d5b0)":"#333",border:"none",borderRadius:12,padding:"13px",color:"#fff",fontWeight:700,fontSize:14,cursor:dcForm.name?"pointer":"default",opacity:dcForm.name?1:0.5}}>
+                Agregar tarjeta →
+              </button>
+              <button onClick={()=>setStep(3)} style={{background:"none",border:`1px solid ${th.border2}`,borderRadius:12,padding:"11px",color:th.textDim,fontSize:12,cursor:"pointer"}}>
+                Omitir por ahora
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ── STEP 3: First Transaction ── */}
+        {step===3&&(
+          <div style={{animation:"fadeUp 0.3s ease"}}>
+            <div style={{fontSize:22,fontWeight:800,color:th.text,marginBottom:6}}>📝 Primer movimiento</div>
+            <div style={{fontSize:13,color:th.textMid,marginBottom:20,lineHeight:1.6}}>
+              Registra tu primer ingreso o egreso. La fecha es importante — si no la recuerdas con exactitud, se usará la fecha de hoy.
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:14}}>
+              {/* Type */}
+              <div style={{display:"flex",gap:8}}>
+                {[{v:"expense",l:"− Egreso / Gasto"},{v:"income",l:"+ Ingreso"}].map(({v,l})=>(
+                  <button key={v} onClick={()=>setTxForm(p=>({...p,type:v}))}
+                    style={{flex:1,padding:"10px",borderRadius:10,border:"none",cursor:"pointer",fontWeight:700,fontSize:12,
+                      background:txForm.type===v?(v==="expense"?"#ff404028":"#00c37a28"):"transparent",
+                      color:txForm.type===v?(v==="expense"?"#ff6060":"#00c37a"):th.textDim,
+                      border:`1px solid ${txForm.type===v?(v==="expense"?"#ff606044":"#00c37a44"):th.border2}`}}>
+                    {l}
+                  </button>
+                ))}
+              </div>
+              <div>
+                <span style={label}>MONTO</span>
+                <input style={inp} type="number" placeholder="0.00" value={txForm.amount} onChange={e=>setTxForm(p=>({...p,amount:e.target.value}))}/>
+              </div>
+              <div>
+                <span style={label}>DESCRIPCIÓN</span>
+                <input style={inp} placeholder="¿Qué fue?" value={txForm.description} onChange={e=>setTxForm(p=>({...p,description:e.target.value}))}/>
+              </div>
+              <div>
+                <span style={label}>FECHA DEL MOVIMIENTO <span style={{color:"#7c6af7"}}>(por defecto: hoy)</span></span>
+                <input style={inp} type="date" value={txForm.date||today} onChange={e=>setTxForm(p=>({...p,date:e.target.value}))}/>
+                <div style={{fontSize:10,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",marginTop:4}}>
+                  Si no recuerdas la fecha exacta, deja la de hoy ✓
+                </div>
+              </div>
+              {allCards.length>0&&(
+                <div>
+                  <span style={label}>TARJETA (opcional)</span>
+                  <select style={{...inp,cursor:"pointer"}} value={txForm.cardId} onChange={e=>setTxForm(p=>({...p,cardId:e.target.value}))}>
+                    <option value="">Sin tarjeta específica</option>
+                    {allCards.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+              )}
+              <button onClick={addFirstTx} disabled={!txForm.amount||!txForm.description}
+                style={{background:txForm.amount&&txForm.description?"linear-gradient(90deg,#7c6af7,#34d5b0)":"#333",border:"none",borderRadius:12,padding:"13px",color:"#fff",fontWeight:700,fontSize:14,cursor:txForm.amount&&txForm.description?"pointer":"default",opacity:txForm.amount&&txForm.description?1:0.5}}>
+                Registrar y entrar →
+              </button>
+              <button onClick={()=>finish(null)} style={{background:"none",border:`1px solid ${th.border2}`,borderRadius:12,padding:"11px",color:th.textDim,fontSize:12,cursor:"pointer"}}>
+                Omitir y entrar a la app
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
    LOCALSTORAGE HELPERS
 ═══════════════════════════════════════════════════════════════ */
 const LS_KEY = "fintrack_v1";
@@ -1128,20 +1827,20 @@ export default function App(){
   const [dark,setDark]=useState(saved?.dark ?? true);
   const th=dark?DARK:LIGHT;
 
-  const [creditCards,setCreditCards]=useState(saved?.creditCards ?? CREDIT_CARDS);
-  const [debitCards,setDebitCards]=useState(saved?.debitCards ?? DEBIT_CARDS);
+  const [creditCards,setCreditCards]=useState(saved?.creditCards ?? []);
+  const [debitCards,setDebitCards]=useState(saved?.debitCards ?? []);
   const cards={credit:creditCards,debit:debitCards};
 
-  const [txs,setTxs]=useState(saved?.txs ?? SEED_TXS);
-  const [active,setActive]=useState(
-    ()=>{
-      const s=loadState();
-      const all=[...(s?.creditCards??CREDIT_CARDS),...(s?.debitCards??DEBIT_CARDS)];
-      return all.find(c=>c.id===s?.activeId) ?? CREDIT_CARDS[0];
-    }
-  );
+  const [txs,setTxs]=useState(saved?.txs ?? []);
+  const allCards=[...creditCards,...debitCards];
+  const [active,setActive]=useState(()=>{
+    const s=loadState();
+    const all=[...(s?.creditCards??[]),...(s?.debitCards??[])];
+    return all.find(c=>c.id===s?.activeId) ?? all[0] ?? null;
+  });
   const [cardMode,setCardMode]=useState(saved?.cardMode ?? "credit");
   const [view,setView]=useState("dash");
+  const [onboarding,setOnboarding]=useState(()=>!(loadState()?.onboardingDone));
   const [reminderSettings,setReminderSettings]=useState(saved?.reminderSettings ?? DEFAULT_REMINDER_SETTINGS);
   const [cardReminders,setCardReminders]=useState(saved?.cardReminders ?? DEFAULT_CARD_REMINDERS);
   const [bannerDismissed,setBannerDismissed]=useState(false);
@@ -1149,8 +1848,8 @@ export default function App(){
 
   // ── Persist on every change ──
   useEffect(()=>{
-    saveState({dark,creditCards,debitCards,txs,activeId:active.id,cardMode,reminderSettings,cardReminders});
-  },[dark,creditCards,debitCards,txs,active.id,cardMode]);
+    saveState({dark,creditCards,debitCards,txs,activeId:active?.id,cardMode,reminderSettings,cardReminders,onboardingDone:!onboarding});
+  },[dark,creditCards,debitCards,txs,active?.id,cardMode,onboarding]);
 
   const addTx=useCallback(tx=>{
     const ntx={...tx,id:genId()};
@@ -1183,14 +1882,15 @@ export default function App(){
   // Keep active card consistent with cardMode
   useEffect(()=>{
     const list=cardMode==="credit"?creditCards:debitCards;
-    if(!list.some(c=>c.id===active.id)) setActive(list[0]);
-  },[cardMode]);
+    if(list.length&&(!active||!list.some(c=>c.id===active?.id))) setActive(list[0]);
+  },[cardMode,creditCards,debitCards]);
 
   // Daily notification check
   useDailyNotifCheck(creditCards, cardReminders, reminderSettings);
 
   // Sync active card data when balances change
   useEffect(()=>{
+    if(!active) return;
     const all=[...creditCards,...debitCards];
     const updated=all.find(c=>c.id===active.id);
     if(updated) setActive(updated);
@@ -1199,6 +1899,16 @@ export default function App(){
   return(
     <>
       <GlobalStyles th={th}/>
+      {onboarding
+        ? <Onboarding th={th} onDone={({creditCards:cc,debitCards:dc,txs:t})=>{
+            if(cc.length) setCreditCards(cc);
+            if(dc.length) setDebitCards(dc);
+            if(t.length)  setTxs(t);
+            const first=[...cc,...dc][0]??null;
+            if(first) setActive(first);
+            setOnboarding(false);
+          }}/>
+        : <AuthGate th={th}>
       <div className="app-shell">
 
         {/* ── HEADER ── */}
@@ -1213,10 +1923,10 @@ export default function App(){
             </div>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               {/* Active card indicator */}
-              <div style={{display:"flex",alignItems:"center",gap:4}}>
+              {active&&<div style={{display:"flex",alignItems:"center",gap:4}}>
                 <div style={{width:6,height:6,borderRadius:"50%",background:active.accent}}/>
                 <span style={{fontSize:10,color:th.textMid,fontFamily:"'JetBrains Mono',monospace"}}>{active.name.split(" ")[0]}</span>
-              </div>
+              </div>}
               {/* Notifications bell */}
               <button onClick={()=>setView("notifs")} style={{
                 width:34,height:34,borderRadius:10,border:`1px solid ${th.border2}`,
@@ -1298,6 +2008,8 @@ export default function App(){
           ))}
         </div>
       </div>
+      </AuthGate>
+      }
       <Toasts toasts={toasts}/>
     </>
   );
