@@ -3,8 +3,8 @@ import {
   Mic, CreditCard, TrendingUp, TrendingDown, Plus, X,
   Tag, Calendar, Zap, Send, Paperclip, FileText,
   MessageCircle, LayoutDashboard, Sparkles, Check, CheckCheck,
-  Volume2, Sun, Moon, ArrowDownLeft, Wallet, DollarSign,
-  Bell, BellOff, Settings, ChevronRight, AlertTriangle
+  Volume2, Sun, Moon, ArrowDownLeft, Wallet,
+  Bell, Settings, ChevronRight, AlertTriangle
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1033,16 +1033,16 @@ function DashView({cards,setCards,transactions,activeCard,setActiveCard,cardMode
         </div>
       )}
 
-      {/* ── Stats ── */}
+      {/* ── Stats ── */
       <div style={{display:"grid",gridTemplateColumns:cardMode==="credit"?"1fr 1fr 1fr":"1fr 1fr",gap:10,padding:"14px 16px 0"}}>
-        {cardMode==="credit"?[
+        {(cardMode==="credit"?[
           {l:"GASTOS",  v:fmt(exp),  c:"#ff6060",I:TrendingDown},
           {l:"PAGOS",   v:fmt(pays), c:"#7c6af7",I:ArrowDownLeft},
-          {l:"MOVIM.",  v:txs.length,c:"#34d5b0",I:CreditCard},
+          {l:"MOVIM.",  v:String(txs.length), c:"#34d5b0",I:CreditCard},
         ]:[
           {l:"EGRESOS", v:fmt(exp),  c:"#ff6060",I:TrendingDown},
           {l:"INGRESOS",v:fmt(inc),  c:"#00c37a",I:TrendingUp},
-        ].concat(txs.length?[{l:"MOVIM.",v:txs.length,c:"#7c6af7",I:Wallet}]:[])}.map(({l,v,c,I},i)=>(
+        ].concat(txs.length?[{l:"MOVIM.",v:String(txs.length),c:"#7c6af7",I:Wallet}]:[])).map(({l,v,c,I},i)=>(
           <div key={i} style={{background:th.surface,border:`1px solid ${th.border}`,borderRadius:16,padding:"13px 12px",animation:`fadeUp 0.35s ease ${i*0.06}s both`}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
               <div style={{fontSize:8,color:th.textDim,fontFamily:"'JetBrains Mono',monospace",letterSpacing:0.5}}>{l}</div>
