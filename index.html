@@ -3,22 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
-
-    <!-- PWA / iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="FinTrack AI" />
-    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#0d0d1a" />
-
-    <!-- Icons -->
     <link rel="icon" type="image/svg+xml" href="/fintrack-ai/icon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/fintrack-ai/apple-touch-icon.png" />
-
     <title>FinTrack AI</title>
-    <script type="module" crossorigin src="/fintrack-ai/assets/index-Csmtt3aE.js"></script>
+    <script>
+      window.__errors = [];
+      window.onerror = function(msg, src, line, col, err) {
+        window.__errors.push(msg);
+        showErr(msg + ' [' + (src||'').split('/').pop() + ':' + line + ']');
+      };
+      window.onunhandledrejection = function(e) {
+        showErr(String(e.reason));
+      };
+      function showErr(txt) {
+        var d = document.getElementById('err-log');
+        if (!d) {
+          d = document.createElement('div');
+          d.id = 'err-log';
+          d.style = 'position:fixed;bottom:0;left:0;right:0;background:#1a0808;color:#ff8080;font-size:12px;padding:16px;z-index:99999;max-height:50vh;overflow:auto;font-family:monospace;border-top:2px solid #ff6060;white-space:pre-wrap';
+          document.body.appendChild(d);
+        }
+        d.textContent += '\n⚠ ' + txt;
+      }
+    </script>
+    <script type="module" crossorigin src="/fintrack-ai/assets/index-CjG8oSuw.js"></script>
   </head>
-  <body>
+  <body style="background:#0d0d1a">
     <div id="root"></div>
   </body>
 </html>
