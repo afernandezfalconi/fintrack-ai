@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Finzio" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#07070f" />
+    <link rel="icon" type="image/svg+xml" href="/fintrack-ai/icon.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/fintrack-ai/apple-touch-icon.png" />
+    <title>Finzio</title>
+    <script>
+      window.onerror = function(msg, src, line) {
+        var d = document.getElementById('err-log');
+        if (!d) {
+          d = document.createElement('div');
+          d.id = 'err-log';
+          d.style = 'position:fixed;bottom:0;left:0;right:0;background:#1a0808;color:#ff8080;font-size:12px;padding:16px;z-index:99999;max-height:40vh;overflow:auto;font-family:monospace;border-top:2px solid #ff6060;white-space:pre-wrap';
+          document.body.appendChild(d);
+        }
+        d.textContent += '\n⚠ ' + msg + ' [' + (src||'').split('/').pop() + ':' + line + ']';
+      };
+      window.onunhandledrejection = function(e){ window.onerror(String(e.reason)); };
+    </script>
+  </head>
+  <body style="background:#07070f">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
